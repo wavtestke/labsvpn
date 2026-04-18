@@ -29,7 +29,6 @@ part 'routing_config_notifier.g.dart';
 // each branch in go router has its own focus scope
 final branchesScope = <String, FocusScopeNode>{
   'home': FocusScopeNode(),
-  'profiles': FocusScopeNode(),
   'settings': FocusScopeNode(),
   'about': FocusScopeNode(),
 };
@@ -41,11 +40,11 @@ final loadingConfig = RoutingConfig(
 
 String getNameOfBranch(bool isMobileBreakpoint, bool showProfilesAction, int index) => isMobileBreakpoint
     ? ['home', 'settings'][index]
-    : ['home', if (showProfilesAction) 'profiles', 'settings', 'about'][index];
+    : ['home', 'settings', 'about'][index];
 
 int getIndexOfBranch(bool isMobileBreakpoint, bool showProfilesAction, String name) => isMobileBreakpoint
     ? ['home', 'settings'].indexOf(name)
-    : ['home', if (showProfilesAction) 'profiles', 'settings', 'about'].indexOf(name);
+    : ['home', 'settings', 'about'].indexOf(name);
 
 @Riverpod(keepAlive: true)
 class RoutingConfigNotifier extends _$RoutingConfigNotifier {
@@ -125,27 +124,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 ),
               ],
             ),
-            if (showProfilesAction)
-              StatefulShellBranch(
-                routes: <GoRoute>[
-                  GoRoute(
-                    name: 'profiles',
-                    path: '/profiles',
-                    builder: (_, _) => FocusScope(node: branchesScope['profiles'], child: const ProfilesPage()),
-                    routes: <GoRoute>[
-                      GoRoute(
-                        name: 'profileDetails',
-                        path: '/profiles/:id',
-                        pageBuilder: (_, state) => customTransition(
-                          TransitionType.fade,
-                          state.pageKey,
-                          ProfileDetailsPage(id: state.pathParameters['id']!),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             StatefulShellBranch(
               routes: <GoRoute>[
                 GoRoute(
