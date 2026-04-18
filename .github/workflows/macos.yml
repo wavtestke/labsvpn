@@ -26,6 +26,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Generate code (build_runner)
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Install CocoaPods
         run: cd macos && pod install && cd ..
 
@@ -34,10 +37,7 @@ jobs:
 
       - name: Create DMG
         run: |
-          APP_PATH="build/macos/Build/Products/Release/MOKY VPN.app"
-          if [ ! -d "$APP_PATH" ]; then
-            APP_PATH=$(find build/macos -name "*.app" -type d | head -1)
-          fi
+          APP_PATH=$(find build/macos -name "*.app" -type d | head -1)
           hdiutil create -volname "MOKY VPN" -srcfolder "$APP_PATH" -ov -format UDZO MOKY-VPN-macOS.dmg
 
       - name: Upload artifact
