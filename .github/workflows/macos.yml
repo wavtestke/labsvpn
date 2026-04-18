@@ -13,6 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download hiddify-core prebuilt binaries
+        run: |
+          mkdir -p hiddify-core/bin
+          curl -L -o hiddify-core.tar.gz https://github.com/hiddify/hiddify-core/releases/download/v4.1.0/hiddify-lib-macos.tar.gz
+          tar -xzf hiddify-core.tar.gz -C hiddify-core/bin
+          ls -la hiddify-core/bin/
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
