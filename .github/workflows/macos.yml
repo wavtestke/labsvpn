@@ -1,0 +1,48 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Enable macOS desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods
+        run: cd macos && pod install && cd ..
+
+      - name: Build macOS release (unsigned)
+        run: flutter build macos --release
+
+      - name: Create DMG
+        run: |
+          APP_PATH="build/macos/Build/Products/Release/MOKY VPN.app"
+          if [ ! -d "$APP_PATH" ]; then
+            APP_PATH=$(find build/macos -name "*.app" -type d | head -1)
+          fi
+          hdiutil create -volname "MOKY VPN" -srcfolder "$APP_PATH" -ov -format UDZO MOKY-VPN-macOS.dmg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOKY-VPN-macOS
+          path: MOKY-VPN-macOS.dmg
+          retention-days: 30
