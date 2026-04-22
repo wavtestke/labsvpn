@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:labsvpn/core/model/constants.dart';
 import 'package:labsvpn/core/theme/moky_colors.dart';
 import 'package:labsvpn/utils/utils.dart';
@@ -27,7 +28,7 @@ class AboutPage extends HookConsumerWidget {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.of(context).maybePop(),
+                    onTap: () => context.go('/'),
                     child: Container(
                       width: 36,
                       height: 36,

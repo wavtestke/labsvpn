@@ -61,6 +61,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
     return RoutingConfig(
       redirect: (context, state) {
         final introCompleted = ref.read(Preferences.introCompleted);
+        final hasProfile = ref.read(hasAnyProfileProvider).value ?? false;
         final isIntro = state.matchedLocation == '/intro';
         // fix path-parameters for deep link
         String? url;
@@ -73,7 +74,8 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           url = state.uri.queryParameters['url'];
         }
 
-        if (!introCompleted) {
+        // Show Intro if: intro not completed, OR no profiles exist (fresh install / reset)
+        if (!introCompleted || !hasProfile) {
           return url != null ? '/intro?url=$url' : '/intro';
         } else if (isIntro) {
           if (url != null)

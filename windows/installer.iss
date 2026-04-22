@@ -1,11 +1,11 @@
-#define MyAppName "MOKY VPN"
+#define MyAppName "LabsVPN"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "MOKY"
-#define MyAppURL "https://moky.site"
+#define MyAppPublisher "LabsVPN"
+#define MyAppURL "https://labsvpn.com"
 #define MyAppExeName "MokyVPN.exe"
 
 [Setup]
-AppId={{A7F5E3B2-9D4E-4B8C-A123-MOKYVPN00001}}
+AppId={{A7F5E3B2-9D4E-4B8C-A123-LabsVPNVPN00001}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -13,7 +13,7 @@ AppPublisherURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=MOKY-VPN-Setup
+OutputBaseFilename=LabsVPN-Setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
