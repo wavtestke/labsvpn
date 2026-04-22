@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:labsvpn/core/analytics/analytics_controller.dart';
@@ -31,6 +32,27 @@ class IntroPage extends HookConsumerWidget with PresLogger {
       autoSelectRegion(ref);
       locationInfoLoaded = true;
     }
+
+    // Auto-paste subscription URL from clipboard on first open
+    useEffect(() {
+      () async {
+        try {
+          final clip = await Clipboard.getData(Clipboard.kTextPlain);
+          final text = clip?.text?.trim() ?? '';
+          if (text.isEmpty || linkController.text.isNotEmpty) return;
+          final isSubUrl = RegExp(
+            r'^https?://[\w.\-]+/sub/[\w\-_=]+$',
+            caseSensitive: false,
+          ).hasMatch(text);
+          final isVless = text.startsWith('vless://') || text.startsWith('vmess://') ||
+              text.startsWith('trojan://') || text.startsWith('ss://') || text.startsWith('hy2://');
+          if (isSubUrl || isVless) {
+            linkController.text = text;
+          }
+        } catch (_) {}
+      }();
+      return null;
+    }, const []);
 
     return Scaffold(
       backgroundColor: mc.bg,

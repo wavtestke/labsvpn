@@ -26,6 +26,7 @@ import 'package:labsvpn/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:labsvpn/utils/utils.dart';
 import 'package:labsvpn/features/connection/model/connection_status.dart';
 import 'package:labsvpn/features/connection/notifier/connection_notifier.dart';
+import 'package:labsvpn/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
@@ -92,6 +93,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
           for (int i = 0; i < 15; i++) {
             await Future.delayed(const Duration(milliseconds: 500));
             try {
+              // Don't auto-connect if there's no active profile —
+              // app will redirect user to intro page instead.
+              if (ref.read(activeProfileProvider).valueOrNull == null) return;
               final status = ref.read(connectionNotifierProvider);
               if (status.valueOrNull is Connected) return;
               if (status.valueOrNull is Disconnected) {

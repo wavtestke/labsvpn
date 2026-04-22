@@ -16,7 +16,13 @@ enum ServiceMode {
 
   final String key;
 
-  static ServiceMode get defaultMode => PlatformUtils.isDesktop ? systemProxy : tun;
+  static ServiceMode get defaultMode {
+    // macOS: systemProxy (TUN requires Apple Developer signing + entitlement)
+    // Windows/Linux: TUN works with admin rights (we request UAC on Windows)
+    // Mobile: always TUN via VpnService / NetworkExtension
+    if (Platform.isMacOS) return systemProxy;
+    return tun;
+  }
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {
