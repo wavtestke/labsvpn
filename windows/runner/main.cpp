@@ -57,7 +57,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
 
   HANDLE hMutexInstance = CreateMutex(NULL, TRUE, L"MokyVpnMutex");
-  HWND handle = FindWindowA(NULL, "LabsVpn");
+  HWND handle = FindWindowA(NULL, "MOKY VPN");
 
   if (GetLastError() == ERROR_ALREADY_EXISTS)
   {

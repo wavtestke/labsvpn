@@ -10,7 +10,8 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
   @override
   AppLocale build() {
     final persisted = ref.watch(sharedPreferencesProvider).requireValue.getString("locale");
-    if (persisted == null) return AppLocaleUtils.findDeviceLocale();
+    // Default to Russian on first launch regardless of device locale
+    if (persisted == null) return AppLocale.ru;
     // keep backward compatibility with chinese after changing zh to zh_CN
     if (persisted == "zh") {
       return AppLocale.zhCn;
@@ -19,7 +20,7 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
       return AppLocale.values.byName(persisted);
     } catch (e) {
       loggy.error("error setting locale: [$persisted]", e);
-      return AppLocale.en;
+      return AppLocale.ru;
     }
   }
 

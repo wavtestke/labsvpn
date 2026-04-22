@@ -62,13 +62,10 @@ class ConnectionButton extends HookConsumerWidget {
         await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
       },
       AsyncData(value: Disconnected()) || AsyncError() => () async {
-        if (ref.read(activeProfileProvider).valueOrNull == null) {
-          await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
-          ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
-        }
-        if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
-          await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-        }
+        // No active profile — stay silent (no English "Choose a profile" dialog).
+        // Profiles are added during intro flow and auto-activated.
+        if (ref.read(activeProfileProvider).valueOrNull == null) return;
+        await ref.read(connectionNotifierProvider.notifier).toggleConnection();
       },
       AsyncData(value: Connected()) => () async {
         if (requiresReconnect == true &&
@@ -123,7 +120,25 @@ class _PulsingButtonState extends State<_PulsingButton> with SingleTickerProvide
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )..repeat();
+    );
+    _syncAnimation();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PulsingButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isConnecting != oldWidget.isConnecting) _syncAnimation();
+  }
+
+  void _syncAnimation() {
+    if (widget.isConnecting) {
+      if (!_controller.isAnimating) _controller.repeat();
+    } else {
+      if (_controller.isAnimating) {
+        _controller.stop();
+        _controller.value = 0;
+      }
+    }
   }
 
   @override
@@ -134,6 +149,8 @@ class _PulsingButtonState extends State<_PulsingButton> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
+    // Only rebuild via ticker when actually pulsing; otherwise render static
+    if (!widget.isConnecting) return _buildButton();
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) => _buildButton(),

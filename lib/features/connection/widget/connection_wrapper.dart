@@ -55,6 +55,7 @@ class _ConnectionWrapperState extends ConsumerState<ConnectionWrapper> with AppL
       if (!mounted) return;
       final repo = BatteryOptimizationRepositoryImpl();
       final isIgnoring = await repo.isIgnoringBatteryOptimizations();
+      if (!mounted) return;
       if (isIgnoring == false) {
         await repo.requestIgnoreBatteryOptimizations();
       }

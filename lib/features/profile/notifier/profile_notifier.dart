@@ -15,6 +15,7 @@ import 'package:labsvpn/features/profile/data/profile_data_providers.dart';
 import 'package:labsvpn/features/profile/data/profile_repository.dart';
 import 'package:labsvpn/features/profile/model/profile_entity.dart';
 import 'package:labsvpn/features/profile/model/profile_failure.dart';
+import 'package:labsvpn/features/profile/model/profile_sort_enum.dart';
 import 'package:labsvpn/features/profile/notifier/active_profile_notifier.dart';
 import 'package:labsvpn/features/settings/data/config_option_repository.dart';
 import 'package:labsvpn/utils/riverpod_utils.dart';
@@ -64,8 +65,6 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      // final activeProfile = await ref.read(activeProfileProvider.future);
-      // final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
       final TaskEither<ProfileFailure, Unit> task;
       if (LinkParser.parse(rawInput) case (final rs)?) {
         loggy.debug("adding profile, url: [${rs.url}]");
@@ -78,7 +77,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
         loggy.debug("adding profile, content");
         task = _profilesRepo.addLocal(safeDecodeBase64(rawInput));
       }
-      return await task
+      final result = await task
           .match(
             (err) {
               loggy.warning("failed to add profile", err);
@@ -90,6 +89,23 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
             },
           )
           .run();
+
+      // Auto-activate the newly added profile so the "Choose a profile" dialog
+      // never appears when the user hits the connect button.
+      try {
+        final stream = await _profilesRepo
+            .watchAll(sort: ProfilesSort.lastUpdate, sortMode: SortMode.descending)
+            .first;
+        stream.match((_) {}, (profiles) async {
+          if (profiles.isEmpty) return;
+          if (profiles.any((p) => p.active)) return;
+          await _profilesRepo.setAsActive(profiles.first.id).run();
+        });
+      } catch (e) {
+        loggy.warning("auto-activate failed", e);
+      }
+
+      return result;
     });
   }
 

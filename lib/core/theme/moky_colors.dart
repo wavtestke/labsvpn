@@ -118,6 +118,11 @@ class MokyThemeData {
   Color get redDim => red.withValues(alpha: 0.1);
 
   static MokyThemeData of(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? dark : light;
+    final themeBrightness = Theme.of(context).brightness;
+    if (themeBrightness == Brightness.dark) return dark;
+    if (themeBrightness == Brightness.light) return light;
+    // Fallback for desktop edge cases when Theme.of returns default
+    final platformBrightness = MediaQuery.platformBrightnessOf(context);
+    return platformBrightness == Brightness.dark ? dark : light;
   }
 }
