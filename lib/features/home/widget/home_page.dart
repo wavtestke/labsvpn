@@ -5,6 +5,7 @@ import 'package:labsvpn/core/theme/moky_colors.dart';
 import 'package:labsvpn/features/connection/model/connection_status.dart';
 import 'package:labsvpn/features/connection/notifier/connection_notifier.dart';
 import 'package:labsvpn/features/home/widget/connection_button.dart';
+import 'package:labsvpn/features/profile/notifier/active_profile_notifier.dart';
 import 'package:labsvpn/features/stats/notifier/stats_notifier.dart';
 import 'package:labsvpn/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:labsvpn/utils/number_formatters.dart';
@@ -18,6 +19,14 @@ class HomePage extends HookConsumerWidget {
     final mc = MokyThemeData.of(context);
     final connectionStatus = ref.watch(connectionNotifierProvider);
     final stats = ref.watch(statsNotifierProvider).asData?.value ?? SystemInfo.create();
+
+    // Safety net: if no profile exists, redirect to intro
+    final hasAnyProfile = ref.watch(hasAnyProfileProvider);
+    if (hasAnyProfile.valueOrNull == false) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) context.go('/intro');
+      });
+    }
 
     final isConnected = connectionStatus.valueOrNull is Connected;
     final isConnecting = connectionStatus.valueOrNull is Connecting || connectionStatus.valueOrNull is Disconnecting;
