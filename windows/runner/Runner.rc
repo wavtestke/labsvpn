@@ -92,10 +92,10 @@ BEGIN
             VALUE "CompanyName", "MOKY VPN" "\0"
             VALUE "FileDescription", "MOKY VPN" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "hiddify" "\0"
+            VALUE "InternalName", "MokyVPN" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 moky.site. All rights reserved." "\0"
             VALUE "OriginalFilename", "MokyVPN.exe" "\0"
-            VALUE "ProductName", "hiddify" "\0"
+            VALUE "ProductName", "MOKY VPN" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
