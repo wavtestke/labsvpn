@@ -1,11 +1,11 @@
-#define MyAppName "LabsVPN"
+#define MyAppName "MOKY VPN"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "LabsVPN"
-#define MyAppURL "https://labsvpn.com"
+#define MyAppPublisher "MOKY VPN"
+#define MyAppURL "https://moky.site"
 #define MyAppExeName "MokyVPN.exe"
 
 [Setup]
-AppId={{A7F5E3B2-9D4E-4B8C-A123-LabsVPNVPN00001}}
+AppId={{A7F5E3B2-9D4E-4B8C-A123-MOKYVPN000001}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -13,7 +13,7 @@ AppPublisherURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=LabsVPN-Setup
+OutputBaseFilename=MOKY-VPN-Setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -36,5 +36,11 @@ Source: "..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignore
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
+; Always run the app as Administrator (VPN requires admin for TUN interface)
+[Registry]
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; \
+    ValueType: string; ValueName: "{app}\{#MyAppExeName}"; ValueData: "~ RUNASADMIN"; \
+    Flags: uninsdeletevalue
+
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Запустить {#MyAppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Запустить {#MyAppName}"; Flags: nowait postinstall skipifsilent runascurrentuser
