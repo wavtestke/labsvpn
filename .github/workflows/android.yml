@@ -19,12 +19,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Download hiddify-core prebuilt binaries
+      - name: Download hiddify-core prebuilt AAR
         run: |
-          mkdir -p hiddify-core/bin
+          mkdir -p android/app/libs
           curl -L -o hiddify-core.tar.gz https://github.com/hiddify/hiddify-core/releases/download/v4.1.0/hiddify-lib-android.tar.gz
-          tar -xzf hiddify-core.tar.gz -C hiddify-core/bin
-          ls -la hiddify-core/bin/
+          tar -xzf hiddify-core.tar.gz -C android/app/libs
+          ls -la android/app/libs/
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
