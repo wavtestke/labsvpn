@@ -45,11 +45,11 @@ jobs:
       - name: Create DMG
         run: |
           APP_PATH=$(find build/macos -name "*.app" -type d | head -1)
-          hdiutil create -volname "LabsVPN" -srcfolder "$APP_PATH" -ov -format UDZO LabsVPN-macOS.dmg
+          hdiutil create -volname "MOKY VPN" -srcfolder "$APP_PATH" -ov -format UDZO MOKY-VPN-macOS.dmg
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LabsVPN-macOS
-          path: LabsVPN-macOS.dmg
+          name: MOKY-VPN-macOS
+          path: MOKY-VPN-macOS.dmg
           retention-days: 30
