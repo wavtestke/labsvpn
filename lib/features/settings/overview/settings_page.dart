@@ -5,7 +5,7 @@ import 'package:labsvpn/core/model/constants.dart';
 import 'package:labsvpn/core/preferences/general_preferences.dart';
 import 'package:labsvpn/core/theme/moky_colors.dart';
 import 'package:labsvpn/features/connection/notifier/connection_notifier.dart';
-import 'package:labsvpn/features/profile/data/profile_repository.dart';
+import 'package:labsvpn/features/profile/data/profile_data_providers.dart';
 import 'package:labsvpn/features/settings/widget/manual_setup_page.dart';
 import 'package:labsvpn/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
