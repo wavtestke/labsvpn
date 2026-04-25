@@ -10,6 +10,14 @@ class MainFlutterWindow: NSWindow {
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
 
+    // Lock window to phone-like fixed size, disable resize/maximize/fullscreen
+    self.styleMask.remove(.resizable)
+    self.collectionBehavior.remove(.fullScreenPrimary)
+    self.collectionBehavior.insert(.fullScreenNone)
+    if let zoomBtn = self.standardWindowButton(.zoomButton) {
+      zoomBtn.isEnabled = false
+    }
+
 
  // Add FlutterMethodChannel platform code
     FlutterMethodChannel(

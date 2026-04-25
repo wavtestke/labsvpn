@@ -12,8 +12,10 @@ import 'package:window_manager/window_manager.dart';
 
 part 'window_notifier.g.dart';
 
-const minimumWindowSize = Size(368, 568);
-const defaultWindowSize = Size(868, 668);
+// Lock desktop window to phone-like aspect for consistent UI with mobile.
+const minimumWindowSize = Size(420, 860);
+const defaultWindowSize = Size(420, 860);
+const maximumWindowSize = Size(420, 860);
 
 @Riverpod(keepAlive: true)
 class WindowNotifier extends _$WindowNotifier with AppLogger {
@@ -31,41 +33,37 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
   }
 
   Future<void> saveWindowState() async {
-    if (await windowManager.isMaximized()) {
-      await ref.read(Preferences.windowMaximized.notifier).update(true);
-    } else {
-      final size = await windowManager.getSize();
-      final position = await windowManager.getPosition();
-
-      await ref.read(Preferences.windowMaximized.notifier).update(false);
-      await ref.read(Preferences.windowSize.notifier).update(size);
-      await ref.read(Preferences.windowPosition.notifier).update(position);
-    }
+    // Window size is fixed (phone-like). Only save position.
+    final position = await windowManager.getPosition();
+    await ref.read(Preferences.windowMaximized.notifier).update(false);
+    await ref.read(Preferences.windowSize.notifier).update(defaultWindowSize);
+    await ref.read(Preferences.windowPosition.notifier).update(position);
   }
 
   Future<void> initWindowState() async {
-    final isMaximized = ref.read(Preferences.windowMaximized);
-    loggy.debug("window state. maximized: $isMaximized");
-    final size = ref.read(Preferences.windowSize);
-    loggy.debug("window state. size: $size");
+    // Force fixed phone-sized window. Ignore any previously saved oversize.
+    const size = defaultWindowSize;
     final position = ref.read(Preferences.windowPosition);
     final isWindowVisible = position != null && await checkWindowVisivility(position, size);
-    loggy.debug("window state. position: ${isWindowVisible ? position : "centered"}");
     final silentStart = ref.read(Preferences.silentStart);
-    loggy.debug("window state. silent start: ${silentStart ? "Enabled" : "Disabled"}");
+    loggy.debug("window state (phone-mode): size=$size, silent=$silentStart");
 
     await windowManager.waitUntilReadyToShow(
-      WindowOptions(size: size, center: !isWindowVisible, minimumSize: minimumWindowSize),
+      WindowOptions(
+        size: size,
+        center: !isWindowVisible,
+        minimumSize: minimumWindowSize,
+        maximumSize: maximumWindowSize,
+      ),
     );
+    // Lock window: not resizable, not maximizable, fullscreen disabled.
+    await windowManager.setResizable(false);
+    await windowManager.setMaximizable(false);
+    if (Platform.isMacOS) {
+      await windowManager.setMaximizable(false);
+    }
     if (isWindowVisible) {
       await windowManager.setPosition(position);
-      loggy.debug("restoring window to position: $position");
-    } else {
-      loggy.debug("no previous position found, centering window");
-    }
-    if (isMaximized) {
-      await windowManager.maximize();
-      loggy.debug("restoring window to maximized state");
     }
     if (!silentStart) {
       await ref.read(windowNotifierProvider.notifier).show(focus: false);
