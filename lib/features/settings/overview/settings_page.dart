@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:labsvpn/core/model/constants.dart';
 import 'package:labsvpn/core/preferences/general_preferences.dart';
 import 'package:labsvpn/core/theme/moky_colors.dart';
+import 'package:labsvpn/features/connection/notifier/connection_notifier.dart';
+import 'package:labsvpn/features/profile/data/profile_repository.dart';
 import 'package:labsvpn/features/settings/widget/manual_setup_page.dart';
 import 'package:labsvpn/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -148,7 +150,22 @@ class SettingsPage extends HookConsumerWidget {
                             ),
                           );
                           if (confirmed == true) {
+                            // 1. Disconnect VPN if active
+                            try {
+                              await ref.read(connectionNotifierProvider.notifier).abortConnection();
+                            } catch (_) {}
+                            // 2. Delete all profiles from DB
+                            try {
+                              final repo = await ref.read(profileRepositoryProvider.future);
+                              final either = await repo.watchAll().first;
+                              final profiles = either.getOrElse((_) => const []);
+                              for (final p in profiles) {
+                                await repo.deleteById(p.id, p.active).run();
+                              }
+                            } catch (_) {}
+                            // 3. Reset intro flag → router will redirect to /intro
                             await ref.read(Preferences.introCompleted.notifier).update(false);
+                            if (context.mounted) context.go('/intro');
                           }
                         },
                       ),
@@ -453,7 +470,7 @@ class _UseMokyBanner extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         width: double.infinity,
-        height: 160,
+        height: 96,
         child: CustomPaint(
           painter: _BannerPainter(mc: mc),
           size: Size.infinite,

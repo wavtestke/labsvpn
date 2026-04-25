@@ -10,6 +10,7 @@ import 'package:labsvpn/features/stats/notifier/stats_notifier.dart';
 import 'package:labsvpn/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:labsvpn/utils/number_formatters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -19,6 +20,12 @@ class HomePage extends HookConsumerWidget {
     final mc = MokyThemeData.of(context);
     final connectionStatus = ref.watch(connectionNotifierProvider);
     final stats = ref.watch(statsNotifierProvider).asData?.value ?? SystemInfo.create();
+
+    // Stable user ID computed once per session (was DateTime.now() → grew on every rebuild)
+    final userId = useMemoized(
+      () => 'V${DateTime.now().millisecondsSinceEpoch ~/ 1000 % 1000000000}',
+      const [],
+    );
 
     // Safety net: if no profile exists, redirect to intro
     final hasAnyProfile = ref.watch(hasAnyProfileProvider);
@@ -122,7 +129,7 @@ class HomePage extends HookConsumerWidget {
                           children: [
                             Text('Ваш ID', style: TextStyle(fontSize: 12, color: mc.t2)),
                             Text(
-                              'V${DateTime.now().millisecondsSinceEpoch ~/ 1000 % 1000000000}',
+                              userId,
                               style: TextStyle(
                                 fontFamily: 'monospace',
                                 fontSize: 13,
