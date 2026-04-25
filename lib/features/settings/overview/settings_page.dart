@@ -470,7 +470,7 @@ class _UseMokyBanner extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         width: double.infinity,
-        height: 96,
+        height: 160,
         child: CustomPaint(
           painter: _BannerPainter(mc: mc),
           size: Size.infinite,

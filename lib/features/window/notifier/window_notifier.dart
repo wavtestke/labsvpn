@@ -13,9 +13,9 @@ import 'package:window_manager/window_manager.dart';
 part 'window_notifier.g.dart';
 
 // Lock desktop window to phone-like aspect for consistent UI with mobile.
-const minimumWindowSize = Size(420, 860);
-const defaultWindowSize = Size(420, 860);
-const maximumWindowSize = Size(420, 860);
+const minimumWindowSize = Size(420, 720);
+const defaultWindowSize = Size(420, 720);
+const maximumWindowSize = Size(420, 720);
 
 @Riverpod(keepAlive: true)
 class WindowNotifier extends _$WindowNotifier with AppLogger {
