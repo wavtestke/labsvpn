@@ -4,7 +4,7 @@
 PRODUCT_NAME = MOKY VPN
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = app.mokyvpn.com
+PRODUCT_BUNDLE_IDENTIFIER = app.mokyvpn
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 MOKY VPN. All rights reserved.

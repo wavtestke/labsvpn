@@ -1,0 +1,76 @@
+name: Build Android AAB (Play Store)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download hiddify-core prebuilt AAR
+        run: |
+          mkdir -p android/app/libs
+          curl -L -o hiddify-core.tar.gz https://github.com/hiddify/hiddify-core/releases/download/v4.1.0/hiddify-lib-android.tar.gz
+          tar -xzf hiddify-core.tar.gz -C android/app/libs
+          ls -la android/app/libs/
+
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p android/keys
+          echo "$KEYSTORE_BASE64" | base64 -d > android/keys/mokyvpn-release.jks
+          ls -la android/keys/mokyvpn-release.jks
+
+      - name: Create key.properties
+        env:
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          {
+            echo "storeFile=../keys/mokyvpn-release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+          echo "key.properties created (contents hidden)"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate code (build_runner)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build Android App Bundle (AAB)
+        run: flutter build appbundle --release
+
+      - name: Rename AAB
+        run: |
+          mkdir -p out
+          cp build/app/outputs/bundle/release/app-release.aab out/MOKY-VPN.aab
+          ls -la out/
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOKY-VPN-Android-AAB
+          path: out/MOKY-VPN.aab
+          retention-days: 90
